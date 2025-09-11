@@ -1,0 +1,208 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/1/Mux16.hdl
+/**
+ * 16-bit multiplexor: 
+ * for i = 0, ..., 15:
+ * if (sel = 0) out[i] = a[i], else out[i] = b[i]
+ */
+CHIP Mux16 {
+    IN a[16], b[16], sel;
+    OUT out[16];
+
+    PARTS:
+    //not selection
+    Nand(a= sel, b= sel, out= notsel);
+    // a[0] AND (NOT sel)
+    Nand(a=a[0], b=notsel, out=a0Nandnotsel);
+    Nand(a=a0Nandnotsel, b=a0Nandnotsel, out=a0Andnotsel);
+
+    // b[0] AND sel
+    Nand(a=b[0], b=sel, out=b0Nandsel);
+    Nand(a=b0Nandsel, b=b0Nandsel, out=b0Andsel);
+
+    // OR of both paths
+    Nand(a=a0Andnotsel, b=b0Andsel, out=finNand0);
+    Nand(a=finNand0, b=finNand0, out=out[0]);
+
+    // a[1] AND (NOT sel)
+    Nand(a=a[1], b=notsel, out=a1Nandnotsel);
+    Nand(a=a1Nandnotsel, b=a1Nandnotsel, out=a1Andnotsel);
+
+    // b[1] AND sel
+    Nand(a=b[1], b=sel, out=b1Nandsel);
+    Nand(a=b1Nandsel, b=b1Nandsel, out=b1Andsel);
+
+    // OR of both paths
+    Nand(a=a1Andnotsel, b=b1Andsel, out=finNand1);
+    Nand(a=finNand1, b=finNand1, out=out[1]);
+
+    // a[2] AND (NOT sel)
+    Nand(a=a[2], b=notsel, out=a2Nandnotsel);
+    Nand(a=a2Nandnotsel, b=a2Nandnotsel, out=a2Andnotsel);
+
+    // b[2] AND sel
+    Nand(a=b[2], b=sel, out=b2Nandsel);
+    Nand(a=b2Nandsel, b=b2Nandsel, out=b2Andsel);
+
+    // OR of both paths
+    Nand(a=a2Andnotsel, b=b2Andsel, out=finNand2);
+    Nand(a=finNand2, b=finNand2, out=out[2]);
+
+    // a[3] AND (NOT sel)
+    Nand(a=a[3], b=notsel, out=a3Nandnotsel);
+    Nand(a=a3Nandnotsel, b=a3Nandnotsel, out=a3Andnotsel);
+
+    // b[3] AND sel
+    Nand(a=b[3], b=sel, out=b3Nandsel);
+    Nand(a=b3Nandsel, b=b3Nandsel, out=b3Andsel);
+
+    // OR of both paths
+    Nand(a=a3Andnotsel, b=b3Andsel, out=finNand3);
+    Nand(a=finNand3, b=finNand3, out=out[3]);
+
+    // a[4] AND (NOT sel)
+    Nand(a=a[4], b=notsel, out=a4Nandnotsel);
+    Nand(a=a4Nandnotsel, b=a4Nandnotsel, out=a4Andnotsel);
+
+    // b[4] AND sel
+    Nand(a=b[4], b=sel, out=b4Nandsel);
+    Nand(a=b4Nandsel, b=b4Nandsel, out=b4Andsel);
+
+    // OR of both paths
+    Nand(a=a4Andnotsel, b=b4Andsel, out=finNand4);
+    Nand(a=finNand4, b=finNand4, out=out[4]);
+
+    // a[5] AND (NOT sel)
+    Nand(a=a[5], b=notsel, out=a5Nandnotsel);
+    Nand(a=a5Nandnotsel, b=a5Nandnotsel, out=a5Andnotsel);
+
+    // b[5] AND sel
+    Nand(a=b[5], b=sel, out=b5Nandsel);
+    Nand(a=b5Nandsel, b=b5Nandsel, out=b5Andsel);
+
+    // OR of both paths
+    Nand(a=a5Andnotsel, b=b5Andsel, out=finNand5);
+    Nand(a=finNand5, b=finNand5, out=out[5]);
+
+    // a[6] AND (NOT sel)
+    Nand(a=a[6], b=notsel, out=a6Nandnotsel);
+    Nand(a=a6Nandnotsel, b=a6Nandnotsel, out=a6Andnotsel);
+
+    // b[6] AND sel
+    Nand(a=b[6], b=sel, out=b6Nandsel);
+    Nand(a=b6Nandsel, b=b6Nandsel, out=b6Andsel);
+
+    // OR of both paths
+    Nand(a=a6Andnotsel, b=b6Andsel, out=finNand6);
+    Nand(a=finNand6, b=finNand6, out=out[6]);
+
+    // a[7] AND (NOT sel)
+    Nand(a=a[7], b=notsel, out=a7Nandnotsel);
+    Nand(a=a7Nandnotsel, b=a7Nandnotsel, out=a7Andnotsel);
+
+    // b[7] AND sel
+    Nand(a=b[7], b=sel, out=b7Nandsel);
+    Nand(a=b7Nandsel, b=b7Nandsel, out=b7Andsel);
+
+    // OR of both paths
+    Nand(a=a7Andnotsel, b=b7Andsel, out=finNand7);
+    Nand(a=finNand7, b=finNand7, out=out[7]);
+
+    // a[8] AND (NOT sel)
+    Nand(a=a[8], b=notsel, out=a8Nandnotsel);
+    Nand(a=a8Nandnotsel, b=a8Nandnotsel, out=a8Andnotsel);
+
+    // b[8] AND sel
+    Nand(a=b[8], b=sel, out=b8Nandsel);
+    Nand(a=b8Nandsel, b=b8Nandsel, out=b8Andsel);
+
+    // OR of both paths
+    Nand(a=a8Andnotsel, b=b8Andsel, out=finNand8);
+    Nand(a=finNand8, b=finNand8, out=out[8]);
+
+    // a[9] AND (NOT sel)
+    Nand(a=a[9], b=notsel, out=a9Nandnotsel);
+    Nand(a=a9Nandnotsel, b=a9Nandnotsel, out=a9Andnotsel);
+
+    // b[9] AND sel
+    Nand(a=b[9], b=sel, out=b9Nandsel);
+    Nand(a=b9Nandsel, b=b9Nandsel, out=b9Andsel);
+
+    // OR of both paths
+    Nand(a=a9Andnotsel, b=b9Andsel, out=finNand9);
+    Nand(a=finNand9, b=finNand9, out=out[9]);
+
+    // a[10] AND (NOT sel)
+    Nand(a=a[10], b=notsel, out=a10Nandnotsel);
+    Nand(a=a10Nandnotsel, b=a10Nandnotsel, out=a10Andnotsel);
+
+    // b[10] AND sel
+    Nand(a=b[10], b=sel, out=b10Nandsel);
+    Nand(a=b10Nandsel, b=b10Nandsel, out=b10Andsel);
+
+    // OR of both paths
+    Nand(a=a10Andnotsel, b=b10Andsel, out=finNand10);
+    Nand(a=finNand10, b=finNand10, out=out[10]);
+
+    // a[11] AND (NOT sel)
+    Nand(a=a[11], b=notsel, out=a11Nandnotsel);
+    Nand(a=a11Nandnotsel, b=a11Nandnotsel, out=a11Andnotsel);
+
+    // b[11] AND sel
+    Nand(a=b[11], b=sel, out=b11Nandsel);
+    Nand(a=b11Nandsel, b=b11Nandsel, out=b11Andsel);
+
+    // OR of both paths
+    Nand(a=a11Andnotsel, b=b11Andsel, out=finNand11);
+    Nand(a=finNand11, b=finNand11, out=out[11]);
+
+    // a[12] AND (NOT sel)
+    Nand(a=a[12], b=notsel, out=a12Nandnotsel);
+    Nand(a=a12Nandnotsel, b=a12Nandnotsel, out=a12Andnotsel);
+
+    // b[12] AND sel
+    Nand(a=b[12], b=sel, out=b12Nandsel);
+    Nand(a=b12Nandsel, b=b12Nandsel, out=b12Andsel);
+
+    // OR of both paths
+    Nand(a=a12Andnotsel, b=b12Andsel, out=finNand12);
+    Nand(a=finNand12, b=finNand12, out=out[12]);
+
+    // a[13] AND (NOT sel)
+    Nand(a=a[13], b=notsel, out=a13Nandnotsel);
+    Nand(a=a13Nandnotsel, b=a13Nandnotsel, out=a13Andnotsel);
+
+    // b[13] AND sel
+    Nand(a=b[13], b=sel, out=b13Nandsel);
+    Nand(a=b13Nandsel, b=b13Nandsel, out=b13Andsel);
+
+    // OR of both paths
+    Nand(a=a13Andnotsel, b=b13Andsel, out=finNand13);
+    Nand(a=finNand13, b=finNand13, out=out[13]);
+
+    // a[14] AND (NOT sel)
+    Nand(a=a[14], b=notsel, out=a14Nandnotsel);
+    Nand(a=a14Nandnotsel, b=a14Nandnotsel, out=a14Andnotsel);
+
+    // b[14] AND sel
+    Nand(a=b[14], b=sel, out=b14Nandsel);
+    Nand(a=b14Nandsel, b=b14Nandsel, out=b14Andsel);
+
+    // OR of both paths
+    Nand(a=a14Andnotsel, b=b14Andsel, out=finNand14);
+    Nand(a=finNand14, b=finNand14, out=out[14]);
+
+    // a[15] AND (NOT sel)
+    Nand(a=a[15], b=notsel, out=a15Nandnotsel);
+    Nand(a=a15Nandnotsel, b=a15Nandnotsel, out=a15Andnotsel);
+
+    // b[15] AND sel
+    Nand(a=b[15], b=sel, out=b15Nandsel);
+    Nand(a=b15Nandsel, b=b15Nandsel, out=b15Andsel);
+
+    // OR of both paths
+    Nand(a=a15Andnotsel, b=b15Andsel, out=finNand15);
+    Nand(a=finNand15, b=finNand15, out=out[15]);
+}

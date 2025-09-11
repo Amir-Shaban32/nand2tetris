@@ -1,0 +1,48 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/1/Or8Way.hdl
+/**
+ * 8-way Or gate: 
+ * out = in[0] Or in[1] Or ... Or in[7]
+ */
+CHIP Or8Way {
+    IN in[8];
+    OUT out;
+
+    PARTS:
+    // in0 OR in1
+    Nand(a=in[0], b=in[0], out=notIn0);
+    Nand(a=in[1], b=in[1], out=notIn1);
+    Nand(a=notIn0, b=notIn1, out=in0Orin1);
+
+    // in2 OR in3
+    Nand(a=in[2], b=in[2], out=notIn2);
+    Nand(a=in[3], b=in[3], out=notIn3);
+    Nand(a=notIn2, b=notIn3, out=in2Orin3);
+
+    // (in0 OR in1) OR (in2 OR in3)
+    Nand(a=in0Orin1, b=in0Orin1, out=notin0Orin1);
+    Nand(a=in2Orin3, b=in2Orin3, out=notin2Orin3);
+    Nand(a=notin0Orin1, b=notin2Orin3, out=in0To3);
+
+    // in4 OR in5
+    Nand(a=in[4], b=in[4], out=notIn4);
+    Nand(a=in[5], b=in[5], out=notIn5);
+    Nand(a=notIn4, b=notIn5, out=in4Orin5);
+
+    // in6 OR in7
+    Nand(a=in[6], b=in[6], out=notIn6);
+    Nand(a=in[7], b=in[7], out=notIn7);
+    Nand(a=notIn6, b=notIn7, out=in6Orin7);
+
+    // (in4 OR in5) OR (in6 OR in7)
+    Nand(a=in4Orin5, b=in4Orin5, out=notin4Orin5);
+    Nand(a=in6Orin7, b=in6Orin7, out=notin6Orin7);
+    Nand(a=notin4Orin5, b=notin6Orin7, out=in4To7);
+
+    // Final OR of all 8 bits
+    Nand(a=in0To3, b=in0To3, out=notIn0To3);
+    Nand(a=in4To7, b=in4To7, out=notIn4To7);
+    Nand(a=notIn0To3, b=notIn4To7, out=out);
+}

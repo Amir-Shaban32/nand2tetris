@@ -1,0 +1,107 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/5/CPU.hdl
+/**
+ * The Hack Central Processing unit (CPU).
+ * Parses the binary code in the instruction input and executes it according to the
+ * Hack machine language specification. In the case of a C-instruction, computes the
+ * function specified by the instruction. If the instruction specifies to read a memory
+ * value, the inM input is expected to contain this value. If the instruction specifies
+ * to write a value to the memory, sets the outM output to this value, sets the addressM
+ * output to the target address, and asserts the writeM output (when writeM = 0, any
+ * value may appear in outM).
+ * If the reset input is 0, computes the address of the next instruction and sets the
+ * pc output to that value. If the reset input is 1, sets pc to 0.
+ * Note: The outM and writeM outputs are combinational: they are affected by the
+ * instruction's execution during the current cycle. The addressM and pc outputs are
+ * clocked: although they are affected by the instruction's execution, they commit to
+ * their new values only in the next cycle.
+ */
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+	// i  _  _  a  c1 c2 c3 c4 c5 c6 d1 d2 d3 j1 j2 j3
+    // 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
+
+
+    // ALUout Mux instruction
+    // instruction[15]=1 (A = 0)
+    Not(in= instruction[15], out= Ainst);
+    Mux16(a= ALUout, b= instruction, sel= Ainst,
+    out= AluInstMux);
+
+    //Aregister
+    //control bits are Ainst ,instruction[5]
+    Or(a=Ainst , b= instruction[5],
+    out= Acontrols);
+    ARegister(in= AluInstMux, load=Acontrols ,
+    out=Aregout,out[0..14] = addressM);
+
+    //inM Mux Aregout
+    //control bits are instruction[15] , a=instruction[12]
+    // which choose between A register or M
+    And(a= instruction[15], b=instruction[12] ,
+    out= AMswitch);
+    Mux16(a= Aregout, b= inM, sel= AMswitch,
+    out= inMAregMux);
+
+    //Dregister
+    //control bits are instruction[4] , instruction[15]
+    And(a= instruction[15], b= instruction[4],
+    out= Dcontrols);
+    DRegister(in= ALUout, load=Dcontrols ,
+    out=Dregout );
+
+    //ALU
+    //control bits from instrution 11 to 6
+    ALU(x=Dregout , y=inMAregMux ,
+    zx=instruction[11] , nx= instruction[10],
+    zy= instruction[9], ny=instruction[8] ,
+    f=instruction[7] , no= instruction[6],
+    out= ALUout,out = outM, zr=Zrout , ng=Ngout );
+
+    //writeM
+    //control bits are instruction[15] , instruction[3]
+    And(a=instruction[15] , b= instruction[3],
+    out=writeM );
+
+    //PC
+    //J1=jump on negative (JLT) & ng
+    //J2=jump on zero (JEQ) & zr
+    //J3=jump on positive (JGT) & positive
+    //If instruction[15]=0 (A-instruction) → jgt=jeq=jlt=0 → no jump.
+    //If instruction[15]=1 (C-instruction) → then j-bits are respected.
+    Not(in= Zrout, out= notZr);
+    Not(in= Ngout, out=notNg );
+    And(a= notZr, b= notNg, out= positive);
+
+    //J1 & ng
+    And(a= instruction[15], b= instruction[2], out=jlt );
+    And(a= jlt, b= Ngout, out= jumpIfLT);
+    //J2 & zr
+    And(a= instruction[15], b= instruction[1], out=jeq );
+    And(a=jeq , b= Zrout, out=jumpIfEQ);
+    //J3 & positive
+    And(a= instruction[15], b= instruction[0], out=jgt );
+    And(a= jgt, b= positive,out=jumpIfGT);
+
+    //jumpcondition = J1ng || J2zr || J3pos
+    Or(a=jumpIfGT, b=jumpIfEQ, out=tmpJump);
+    Or(a=tmpJump, b=jumpIfLT, out=jumpCond); 
+
+    PC(in=Aregout , load= jumpCond, inc=true ,
+    reset=reset , out[0..14]= pc);
+
+}
