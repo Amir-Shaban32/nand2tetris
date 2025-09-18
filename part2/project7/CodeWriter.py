@@ -1,5 +1,5 @@
 from Parser import *
-
+import os
 class CodeWriter:
     """
     Translates VM commands into Hack assembly code and writes to the output file.
@@ -87,8 +87,8 @@ class CodeWriter:
         Uses unique labels for branching.
         """
         jump = {"eq": "JEQ", "gt": "JGT", "lt": "JLT"}[command]
-        lable_true = f"{command.upper()}_TRUE_{self.label_counter}"
-        lable_end = f"{command.upper()}_END_{self.label_counter}"
+        lable_true = f"{command.upper()}_TRUE_{self.label_counter}"  
+        lable_end = f"{command.upper()}_END_{self.label_counter}"    
         self.label_counter += 1
 
         asm = f"""//{command}
@@ -125,13 +125,14 @@ M=M+1
         - constant: push only (pushes a value)
         - temp: push/pop to RAM[5-12]
         """
+        original_idx = idx  # Store original index for comment
         if segment == "temp":
             idx += 5  # temp segment starts at RAM[5]
         if command == "push":
             if segment == "temp":
                 # Push value from temp segment
                 return (
-                    f"//{command} {segment} {idx-5}\n"
+                    f"//{command} {segment} {original_idx}\n"  
                     f"@{idx}\n"
                     "D=M\n"
                     "@SP\n"
@@ -156,7 +157,7 @@ M=M+1
             if segment == "temp":
                 # Pop value to temp segment
                 return (
-                    f"//{command} {segment} {idx-5}\n"
+                    f"//{command} {segment} {original_idx}\n"  
                     "@SP\n"
                     "M=M-1\n"
                     "A=M\n"
@@ -174,30 +175,14 @@ M=M+1
         These use base pointers (LCL, ARG, THIS, THAT).
         """
         memory = {"local": "LCL", "argument": "ARG", "this": "THIS", "that": "THAT"}[segment]
-        if command == "push":
-            # Push value from segment base + idx
+        if command == "pop":
+            # pop value from segment base + idx
             return (
                 f"//{command} {segment} {idx}\n"
                 f"@{idx}\n"
                 "D=A\n"
                 f"@{memory}\n"
-                "A=D+M\n"
-                "D=M\n"
-                "@SP\n"
-                "A=M\n"
-                "M=D\n"
-                "@SP\n"
-                "M=M+1\n"
-            )
-        else:
-            # Pop value to segment base + idx
-            return (
-                f"//{command} {segment} {idx}\n"
-                f"@{idx}\n"
-                "D=A\n"
-                f"@{memory}\n"
-                "A=D+M\n"
-                "D=A\n"
+                "D=D+M\n"
                 "@R13\n"
                 "M=D\n"
                 "@SP\n"
@@ -208,6 +193,22 @@ M=M+1
                 "A=M\n"
                 "M=D\n"
             )
+        else:
+            # FIXED: push value from segment base + idx to stack
+            return (
+                f"//{command} {segment} {idx}\n"
+                f"@{idx}\n"
+                "D=A\n"
+                f"@{memory}\n"
+                "D=D+M\n"   
+                "A=D\n"     
+                "D=M\n"     
+                "@SP\n"
+                "A=M\n"
+                "M=D\n"     
+                "@SP\n"
+                "M=M+1\n"   
+            )
 
     def _write_pointer_static(self, command, segment, idx):
         """
@@ -217,7 +218,8 @@ M=M+1
         """
         if segment == "static":
             # Static variable: use fileName.idx
-            pointer_static = f"{self.file_name.split('/')[-1].replace('.asm','')}.{idx}"
+            file_base = os.path.basename(self.file_name).replace('.asm', '')
+            pointer_static = f"{file_base}.{idx}"
         else:
             # Pointer: 0 -> THIS, 1 -> THAT
             pointer_static = "THIS" if idx == 0 else "THAT"
@@ -249,6 +251,9 @@ M=M+1
         """
         Writes an infinite loop at the end of the file and closes it.
         """
-        self.file.write("\n0;JMP")
+        self.file.write(
+            "\n(END)\n"
+            "@END\n"
+            "0;JMP\n"
+        )
         self.file.close()
-
