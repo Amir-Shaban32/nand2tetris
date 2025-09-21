@@ -13,6 +13,7 @@ class Parser:
         self.idx = 0
         self.current_command = ""
 
+
     def _clean_line(self, line):
         """
         Removes comments and whitespace from a line.

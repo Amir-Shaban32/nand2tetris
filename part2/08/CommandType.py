@@ -4,7 +4,6 @@ CommandType.py
 Defines constants for VM command types used by the Parser and CodeWriter.
 These constants represent the different categories of VM commands in the Hack VM specification.
 """
-
 # Arithmetic and logical commands
 C_ARITHMETIC = "C_ARITHMETIC"  # add, sub, neg, eq, gt, lt, and, or, not
 

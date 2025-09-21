@@ -4,6 +4,7 @@ from Parser import *
 from CodeWriter import *
 from CommandType import *
 
+
 def main():
     # Check command line arguments
     if len(sys.argv) != 2:

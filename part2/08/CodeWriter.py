@@ -1,6 +1,7 @@
 from Parser import *
 import os
 
+
 class CodeWriter:
     """
     Translates VM commands into Hack assembly code and writes to the output file.
