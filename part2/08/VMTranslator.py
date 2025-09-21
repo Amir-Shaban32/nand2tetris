@@ -31,9 +31,9 @@ def main():
         if not vm_files:
             print(f"No .vm files found in directory: {input_path}")
             return
-        # Output file named after directory, saved in current directory
+        # Output file named after directory, saved in same test directory
         dir_name = os.path.basename(input_path.rstrip('/\\'))
-        output_file = dir_name + ".asm"
+        output_file = os.path.join(input_path, dir_name + ".asm")
         
     else:
         print("Error: Input must be a .vm file or directory containing .vm files")
